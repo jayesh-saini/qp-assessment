@@ -10,6 +10,9 @@ dotenv.config()
 
 const { PORT } = process.env
 
+import adminRouter from './routers/admin-router'
+import userRouter from './routers/user-router'
+
 app.use((req, res, next) => {
     console.log('-------------------')
     console.log(new Date().toString())
@@ -18,7 +21,8 @@ app.use((req, res, next) => {
 })
 
 // Routers
-
+app.use('/api/admin', adminRouter)
+app.use('/api/user', userRouter)
 
 // Health Check API
 app.get('/api/health', (req, res) => {

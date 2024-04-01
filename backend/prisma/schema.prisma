@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider            = "mysql"
+  url                 = env("DATABASE_URL")
+  shadowDatabaseUrl   = env("SHADOW_DATABASE_URL")
+}
+
+// Models
+model admins {
+  id          Int @id @default(autoincrement())
+  username    String
+  password    String
+}
+
+model users {
+  id            Int @id @default(autoincrement())
+  full_name     String
+  email         String @unique
+  password      String
+  contact       String
+  orders        orders[]
+}
+
+model products {
+  id            Int @id @default(autoincrement())
+  name          String
+  description   String @db.LongText
+  visibility    Boolean @default(true)
+  variations    variations[]
+}
+
+model variations {
+  id            Int @id @default(autoincrement())
+  name          String
+  regular_price Float
+  sale_price    Float
+  stock         Int
+  pack_size     Int
+  unit          String
+  product_id    Int
+  products      products  @relation(fields: [product_id], references: [id])
+  order_items   order_items[]
+  image_url     String
+  visibility    Boolean @default(true)
+}
+
+model orders {
+  id                  Int @id @default(autoincrement())
+  delivery_address    String @db.LongText
+  user_id             Int
+  created_at          DateTime @default(now())
+  status              String
+  users               users @relation(fields: [user_id], references: [id])
+  order_items         order_items[]
+}
+
+model order_items {
+  id                  Int @id @default(autoincrement())
+  order_id            Int
+  orders              orders @relation(fields: [order_id], references: [id])
+  variation_id        Int
+  variations          variations @relation(fields: [variation_id], references: [id])
+  quantity            Int
+  price               Float
+}
