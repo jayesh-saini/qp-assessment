@@ -56,6 +56,41 @@ export const addVariant = async (req: Request, res: Response) => {
     }
 }
 
+export const listProductsAdmin = async (req: Request, res: Response) => {
+    try {
+        const products = await prisma.products.findMany({
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                variations: {
+                    select: {
+                        id: true,
+                        name: true,
+                        regular_price: true,
+                        sale_price: true,
+                        pack_size: true,
+                        unit: true,
+                        image_url: true,
+                        stock: true,
+                    }, where: {
+                        visibility: true
+                    }
+                }
+            }, where: {
+                visibility: true
+            }, orderBy: {
+                id: "desc"
+            }
+        })
+
+        return res.json(SUCCESS(products))
+    } catch (error) {
+        console.log(error)
+        res.json(ISE())
+    }
+}
+
 export const listProducts = async (req: Request, res: Response) => {
     try {
         const products = await prisma.products.findMany({
