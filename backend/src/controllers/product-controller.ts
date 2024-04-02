@@ -56,6 +56,39 @@ export const addVariant = async (req: Request, res: Response) => {
     }
 }
 
+export const deleteVariant = async (req: Request, res: Response) => {
+    try {
+        const parsed_variant_id = productIdSchema.safeParse(+req.params.variation_id)
+
+        if(!parsed_variant_id.success) {
+            console.log(parsed_variant_id.error);
+            
+            return res.json(BAD_REQ())
+        }
+
+        const delete_resp = await prisma.variations.update({
+            data: {
+                visibility: false
+            }, where: {
+                id: parsed_variant_id.data,
+                visibility: true
+            }
+        }) 
+
+        if(delete_resp) {
+            return res.json(SUCCESS())
+        }
+        console.log(delete_resp)
+        throw new Error("Can not delete variation!")
+    } catch (error: any) {
+        if(error.code == "P2025") {
+            return res.json(RESPONSES(404, "Variation ID not found!"))
+        }
+        console.log(error)
+        return res.json(ISE())
+    }
+}
+
 export const listProductsAdmin = async (req: Request, res: Response) => {
     try {
         const products = await prisma.products.findMany({
@@ -127,6 +160,35 @@ export const listProducts = async (req: Request, res: Response) => {
         })
 
         return res.json(SUCCESS(products))
+    } catch (error) {
+        console.log(error)
+        res.json(ISE())
+    }
+}
+
+export const getProductDetails = async (req: Request, res: Response) => {
+    try {
+        const validated_product_id = productIdSchema.safeParse(+req.params.product_id)
+        if(!validated_product_id.success) {
+            return res.json(BAD_REQ())
+        } 
+        const product_data = await prisma.products.findUnique({
+            where: {
+                id: validated_product_id.data,
+                visibility: true
+            }, include: {
+                variations: {
+                    where: {
+                        visibility: true
+                    }
+                }
+            }
+        })
+        if(product_data) {
+            res.json(SUCCESS(product_data))
+        } else {
+            res.json(RESPONSES(404, "Product data not found!"))
+        }
     } catch (error) {
         console.log(error)
         res.json(ISE())
