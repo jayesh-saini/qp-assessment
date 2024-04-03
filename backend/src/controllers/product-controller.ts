@@ -166,6 +166,40 @@ export const listProducts = async (req: Request, res: Response) => {
     }
 }
 
+export const deleteProduct = async (req: Request, res: Response) => {
+    try {
+        const validated_product_id = productIdSchema.safeParse(+req.params.product_id)
+        if(!validated_product_id.success) {
+            return res.json(BAD_REQ())
+        }
+
+        await prisma.variations.updateMany({
+            data: {
+                visibility: false
+            }, where: {
+                product_id: validated_product_id.data,
+                visibility: true
+            }
+        })
+
+        await prisma.products.update({
+            data: {
+                visibility: false
+            }, where: {
+                visibility: true,
+                id: validated_product_id.data
+            }
+        })
+        res.json(SUCCESS())
+    } catch (error: any) {
+        if(error.code == "P2025") {
+            return res.json(RESPONSES(404, "Product not found!"))
+        }
+        console.log(error)
+        return res.json(ISE())
+    }
+}
+
 export const getProductDetails = async (req: Request, res: Response) => {
     try {
         const validated_product_id = productIdSchema.safeParse(+req.params.product_id)
