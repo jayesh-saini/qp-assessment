@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { addProduct, addVariant, listProductsAdmin, editProduct, deleteVariant, getProductDetails, deleteProduct } from "../controllers/product-controller"
+import { addProduct, addVariant, listProductsAdmin, editProduct, deleteVariant, getProductDetails, deleteProduct, editVariant } from "../controllers/product-controller"
 
 const router = Router()
 
@@ -10,5 +10,6 @@ router.delete('/product/:product_id', deleteProduct)
 router.post('/variation', addVariant)
 router.delete('/variation/:variation_id', deleteVariant)
 router.get('/products', listProductsAdmin)
+router.put('/variant/:variant_id', editVariant)
 
 export default router

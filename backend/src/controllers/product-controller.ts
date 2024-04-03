@@ -1,5 +1,5 @@
 import { Request, Response, response } from 'express'
-import { productSchema, variantSchema, productIdSchema, orderPaylodSchema } from '../middlewares/schema-validation'
+import { productSchema, variantSchema, productIdSchema, orderPaylodSchema, updateVariantSchema } from '../middlewares/schema-validation'
 import { RESPONSES, BAD_REQ, ISE, SUCCESS } from '../utils/responses'
 import { ErrorInterface } from '../utils/interfaces'
 import prisma from '../db'
@@ -254,6 +254,30 @@ export const editProduct = async (req: Request, res: Response) => {
     } catch (error) {
         console.log(error)
         return res.json(ISE())        
+    }
+}
+
+export const editVariant = async (req: Request, res: Response) => {
+    try {
+        const validated_variant_id = productIdSchema.safeParse(+req.params.variant_id)
+        const update_payload = updateVariantSchema.safeParse(req.body)
+        if(!validated_variant_id.success || !update_payload.success) {
+            return res.json(BAD_REQ())
+        }
+
+        await prisma.variations.update({
+            data: {
+                ...update_payload.data
+            }, where: {
+                id: validated_variant_id.data
+            }
+        })
+
+        return res.json(SUCCESS())
+
+    } catch (error) {
+        console.log(error)
+        res.json(ISE())
     }
 }
 

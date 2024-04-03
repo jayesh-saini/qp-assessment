@@ -18,6 +18,16 @@ export const variantSchema = zod.object({
     image_url: zod.string().max(190).optional()
 })
 
+export const updateVariantSchema = zod.object({
+    name: zod.string().trim().min(1).max(100),
+    regular_price: zod.number().positive(),
+    sale_price: zod.number().positive(),
+    stock: zod.number().int().positive(),
+    pack_size: zod.number().int().positive(),
+    unit: zod.string().max(10),
+    image_url: zod.string().max(190).optional()
+}) 
+
 export const orderPaylodSchema = zod.object({
     order_items: zod.array(zod.object({
         variant_id: zod.number().int().positive(),
