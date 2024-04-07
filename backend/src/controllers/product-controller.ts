@@ -300,6 +300,38 @@ export const editVariant = async (req: Request, res: Response) => {
     }
 }
 
+export const getMultiProductDetails = async (req: Request, res: Response) => {
+    try {
+        // TO::DO - add validation here!
+        const variation_ids = req.body.variation_ids
+
+        if(variation_ids.length == 0) {
+            return res.json(SUCCESS([]))
+        }
+
+        const variations_data = await prisma.variations.findMany({
+            select: {
+                id: true,
+                name: true,
+                sale_price: true,
+                regular_price: true,
+                image_url: true
+            }, where: {
+                visibility: true,
+                stock: {
+                    gt: 0
+                },
+                id: {
+                    in: variation_ids
+                }
+            }
+        })
+        return res.json(SUCCESS(variations_data))
+    } catch (error) {
+        console.log(error)        
+    }
+}
+
 export const createOrder = async (req: Request, res: Response) => {
     try {
         const { user_id } = { user_id: 1 } //req.payload.id
