@@ -7,7 +7,8 @@ export interface ErrorInterface {
 export interface userPayloadInterface {
     full_name: string,
     email: string,
-    contact: string
+    contact: string,
+    role: string
 }
 
 export interface userPayloadRequest extends Request {

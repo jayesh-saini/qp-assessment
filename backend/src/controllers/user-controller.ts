@@ -49,7 +49,7 @@ export const login = async(req: Request, res: Response) => {
                 return res.json(RESPONSES(400, "Email not registered or password is incorrect!"))
             }
             const { password, ...user } = user_details
-            const access_token = await createUserAuthToken(user)
+            const access_token = await createUserAuthToken({...user, role: "user"})
             return res.json(SUCCESS({ user, access_token }))
         }
         return res.json(RESPONSES(400, "Email not registered or password is incorrect!"))
