@@ -21,8 +21,10 @@ export const createUserAuthToken = (payload: userPayloadInterface) => {
 export const verifyUserToken: RequestHandler = (req: any, res, next) => {
     try {
         const { access_token }: any = req.headers
+
         if(access_token != null) {
-            const { payload }: any = jwt.verify(access_token, AUTH_SECRET)
+            const payload = jwt.verify(access_token, AUTH_SECRET)
+                       
             req.payload = payload
             return next()
         }

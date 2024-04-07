@@ -279,8 +279,7 @@ export const editVariant = async (req: Request, res: Response) => {
         const validated_variant_id:any = productIdSchema.safeParse(+req.params.variant_id)
         const update_payload:any = updateVariantSchema.safeParse(req.body)
         if (!validated_variant_id.success || !update_payload.success) {
-            console.log(update_payload.error)
-            // console.log(error)            
+            console.log(update_payload?.error)
             return res.json(BAD_REQ())
         }
 
@@ -328,13 +327,14 @@ export const getMultiProductDetails = async (req: Request, res: Response) => {
         })
         return res.json(SUCCESS(variations_data))
     } catch (error) {
-        console.log(error)        
+        console.log(error)
+        return res.json(ISE())  
     }
 }
 
-export const createOrder = async (req: Request, res: Response) => {
+export const createOrder = async (req: any, res: Response) => {
     try {
-        const { user_id } = { user_id: 1 } //req.payload.id
+        const user_id = req.payload.id
         const validated_order_payload = orderPaylodSchema.safeParse(req.body)
         if (!validated_order_payload.success) {
             console.log(validated_order_payload.error?.issues || validated_order_payload.error)
@@ -428,5 +428,48 @@ export const createOrder = async (req: Request, res: Response) => {
             return res.json(RESPONSES(error.status_code, error.message))
         }
         return res.json(ISE())
+    }
+}
+
+export const listOrders = async (req: any, res: Response) => {
+    try {
+        const { id } = req.payload
+
+        const order_details = await prisma.orders.findMany({
+            select: {
+                id: true,
+                order_items: {
+                    select: {
+                        price: true,
+                        quantity: true,
+                        variations: {
+                            select: {
+                                name: true,
+                                image_url: true
+                            }
+                        }
+                    }
+                }, 
+                created_at: true
+            }, where: {
+                user_id: id
+            }
+        })
+
+        const orders = order_details.map((order) => {
+            return order.order_items.map((item) => {
+                return { 
+                    name: item.variations.name,
+                    iamge_url: item.variations.image_url,
+                    price: item.price,
+                    quantity: item.quantity
+                }
+            })
+        })
+
+        return res.json(SUCCESS(orders))
+    } catch (error) {
+        console.log(error)
+        res.json(ISE())
     }
 }
