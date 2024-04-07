@@ -4,7 +4,6 @@ services:
   mysqldb:
     container_name: mysqldb
     image: mysql:latest
-    # restart: unless-stopped
     environment:
       - MYSQL_DATABASE=grocery_store
       - MYSQL_ROOT_PASSWORD=admin123
@@ -22,23 +21,11 @@ services:
       mysqldb: 
         condition: service_healthy
     build: ./backend
-    # restart: unless-stopped
-    # env_file: ./.env
     ports:
       - 3000:3000
-    # environment:
-    #   - DB_HOST=mysqldb
-    #   - DB_USER=$MYSQLDB_USER
-    #   - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-    #   - DB_NAME=$MYSQLDB_DATABASE
-    #   - DB_PORT=$MYSQLDB_DOCKER_PORT
     stdin_open: true
     tty: true
   frontend:
     build: ./frontend
     ports:
       - 80:80
-
-
-# nginx -s reload
-# try_files $uri $uri/ /index.html;
