@@ -3,6 +3,7 @@ import { userSchema, userCredsSchema } from '../middlewares/schema-validation'
 import { RESPONSES, BAD_REQ, ISE, SUCCESS } from '../utils/responses'
 import { createUserAuthToken } from "../middlewares/auth"
 import { ErrorInterface } from '../utils/interfaces'
+import bcrypt from "bcrypt"
 import prisma from '../db'
 
 export const register = async(req: Request, res: Response) => {
@@ -12,7 +13,7 @@ export const register = async(req: Request, res: Response) => {
             return res.json(BAD_REQ())
         }
 
-// TO::DO - Encrypt the password using bcrypt!
+        validated_user.data.password = bcrypt.hashSync(validated_user.data.password, 10)
 
         await prisma.users.create({
             data: {
@@ -43,9 +44,12 @@ export const login = async(req: Request, res: Response) => {
             }
         })
 
+        if(!user_details) {
+            return res.json(RESPONSES(400, "Email not registered or password is incorrect!"))            
+        }
+
         if(validated_user_creds) {
-            // TO::DO - Compare password using bcrypt!
-            if(validated_user_creds.data.password != user_details?.password)  {
+            if(!bcrypt.compareSync(validated_user_creds.data.password, user_details?.password))  {
                 return res.json(RESPONSES(400, "Email not registered or password is incorrect!"))
             }
             const { password, ...user } = user_details
