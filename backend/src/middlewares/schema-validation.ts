@@ -47,3 +47,7 @@ export const userCredsSchema = zod.object({
     email: zod.string().email().max(100),
     password: zod.string().max(50)
 })
+
+export const variationIdsSchema = zod.array(
+    zod.number().int().positive()
+)

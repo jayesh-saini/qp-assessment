@@ -1,5 +1,5 @@
 import { Request, Response, response } from 'express'
-import { productSchema, variantSchema, productIdSchema, orderPaylodSchema, updateVariantSchema } from '../middlewares/schema-validation'
+import { productSchema, variantSchema, productIdSchema, orderPaylodSchema, updateVariantSchema, variationIdsSchema } from '../middlewares/schema-validation'
 import { RESPONSES, BAD_REQ, ISE, SUCCESS } from '../utils/responses'
 import { ErrorInterface } from '../utils/interfaces'
 import prisma from '../db'
@@ -301,10 +301,13 @@ export const editVariant = async (req: Request, res: Response) => {
 
 export const getMultiProductDetails = async (req: Request, res: Response) => {
     try {
-        // TO::DO - add validation here!
-        const variation_ids = req.body.variation_ids
+        const variation_ids = variationIdsSchema.safeParse(req.body.variation_ids)
 
-        if(variation_ids.length == 0) {
+        if(!variation_ids.success) {
+            return res.json(BAD_REQ())
+        }
+
+        if(variation_ids.data.length == 0) {
             return res.json(SUCCESS([]))
         }
 
@@ -321,7 +324,7 @@ export const getMultiProductDetails = async (req: Request, res: Response) => {
                     gt: 0
                 },
                 id: {
-                    in: variation_ids
+                    in: variation_ids.data
                 }
             }
         })
