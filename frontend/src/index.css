@@ -1,0 +1,32 @@
+.flexRowContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.flexColumnContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.flexColumnBWContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.flexRowBWContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-4 {
+    flex: 4;
+}
