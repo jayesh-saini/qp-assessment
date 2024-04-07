@@ -2,6 +2,7 @@ import Button from 'react-bootstrap/Button';
 import './Style.scss';
 import Logo from '../../assets/images/logo.png';
 import LogoutIcon from '../../assets/images/icons/logout-icon.svg';
+import cartIcon from '../../assets/images/icons/cart-icon.png';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../../Context/AuthContext';
@@ -20,6 +21,10 @@ const Header = () => {
                 </div>
             </div>
             <div className='logout-button-container'>
+                <Button variant="primary" className='flexRowContainer d-flex mx-2' onClick={() => { navigate("/cart") }}>
+                    <span>Cart</span>
+                    <img src={cartIcon} className='cart-img' />
+                </Button>
                 <Button variant="primary" className='flexRowContainer d-flex' onClick={() => {
                     localStorage.removeItem("access_token")
                     localStorage.removeItem("cart")
@@ -28,7 +33,7 @@ const Header = () => {
                     navigate("/login")
                 }}>
                     <span>Logout</span>
-                    <img src={LogoutIcon} className='logout-img'/>
+                    <img src={LogoutIcon} className='logout-img' />
                 </Button>
             </div>
         </div>

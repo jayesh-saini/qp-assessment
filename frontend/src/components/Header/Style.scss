@@ -16,9 +16,14 @@
         }
     }
     .logout-button-container{
+        display: flex;
+        align-items: center;
         .logout-img{
             padding-left: 8px;
         }
     }
-    
+    .cart-img {
+        width: 16px;
+        // height: 30px;
+    }
 }

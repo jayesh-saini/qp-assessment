@@ -9,6 +9,7 @@ import { AuthContext, AuthProvider } from "./Context/AuthContext"
 import { useContext } from 'react';
 import ProductListing from "./components/ProductListing/ProductListing"
 import Login from './components/Login/Login';
+import Cart from "./components/Cart/Cart"
 
 const UserProtectedRoute = ({ children }: any) => {
   const { role }: any = useContext(AuthContext)
@@ -18,7 +19,7 @@ const UserProtectedRoute = ({ children }: any) => {
 
 const Root = () => {
   const { role }: any = useContext(AuthContext)
-  
+
   return (
     <BrowserRouter>
       <Routes>
@@ -28,6 +29,7 @@ const Root = () => {
             <ProductListing />
           </UserProtectedRoute>}>
         </Route>
+        <Route path='/cart' element={ role == "user" ? <><Header /><Cart /></> : <Login />} />
         <Route path='/login' element={ role == "user" ? <Navigate to="/" /> : <Login />} />
         <Route path='/register' element={<Auth />} />
         <Route path='/admin/products' element={<Products />} />
