@@ -48,6 +48,11 @@ export const userCredsSchema = zod.object({
     password: zod.string().max(50)
 })
 
+export const adminCredsSchema = zod.object({
+    username: zod.string().max(100),
+    password: zod.string().max(50)
+})
+
 export const variationIdsSchema = zod.array(
     zod.number().int().positive()
 )

@@ -5,7 +5,7 @@ import { userPayloadInterface, userPayloadRequest } from "../utils/interfaces"
 import { RequestHandler, Response, NextFunction } from "express"
 import { UNAUTH_ACCESS } from "../utils/responses"
 
-export const createUserAuthToken = (payload: userPayloadInterface) => {
+export const createUserAuthToken = (payload: any) => {
     return new Promise(async (resolve, reject) => {
         try {
             const token = jwt.sign(payload, AUTH_SECRET, {

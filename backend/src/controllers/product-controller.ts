@@ -150,7 +150,12 @@ export const listProducts = async (req: Request, res: Response) => {
                     }
                 }
             }, where: {
-                visibility: true
+                visibility: true,
+                variations: {
+                    some: {
+                        visibility: true
+                    }
+                }
             }, orderBy: {
                 id: "desc"
             }
@@ -235,6 +240,7 @@ export const getProductDetails = async (req: Request, res: Response) => {
                 visibility: true
             }
         })
+        
         if (product_data) {
             res.json(SUCCESS(product_data))
         } else {
@@ -276,8 +282,8 @@ export const editProduct = async (req: Request, res: Response) => {
 
 export const editVariant = async (req: Request, res: Response) => {
     try {
-        const validated_variant_id:any = productIdSchema.safeParse(+req.params.variant_id)
-        const update_payload:any = updateVariantSchema.safeParse(req.body)
+        const validated_variant_id: any = productIdSchema.safeParse(+req.params.variant_id)
+        const update_payload: any = updateVariantSchema.safeParse(req.body)
         if (!validated_variant_id.success || !update_payload.success) {
             console.log(update_payload?.error)
             return res.json(BAD_REQ())
@@ -303,11 +309,11 @@ export const getMultiProductDetails = async (req: Request, res: Response) => {
     try {
         const variation_ids = variationIdsSchema.safeParse(req.body.variation_ids)
 
-        if(!variation_ids.success) {
+        if (!variation_ids.success) {
             return res.json(BAD_REQ())
         }
 
-        if(variation_ids.data.length == 0) {
+        if (variation_ids.data.length == 0) {
             return res.json(SUCCESS([]))
         }
 
@@ -317,7 +323,9 @@ export const getMultiProductDetails = async (req: Request, res: Response) => {
                 name: true,
                 sale_price: true,
                 regular_price: true,
-                image_url: true
+                image_url: true,
+                unit: true,
+                pack_size: true
             }, where: {
                 visibility: true,
                 stock: {
@@ -331,7 +339,7 @@ export const getMultiProductDetails = async (req: Request, res: Response) => {
         return res.json(SUCCESS(variations_data))
     } catch (error) {
         console.log(error)
-        return res.json(ISE())  
+        return res.json(ISE())
     }
 }
 
@@ -438,7 +446,7 @@ export const listOrders = async (req: any, res: Response) => {
     try {
         const { id } = req.payload
 
-        const order_details = await prisma.orders.findMany({
+        const order_details:any = await prisma.orders.findMany({
             select: {
                 id: true,
                 order_items: {
@@ -452,25 +460,27 @@ export const listOrders = async (req: any, res: Response) => {
                             }
                         }
                     }
-                }, 
+                },
                 created_at: true
             }, where: {
                 user_id: id
+            }, orderBy: {
+                id: "desc"
             }
         })
 
-        const orders = order_details.map((order) => {
-            return order.order_items.map((item) => {
-                return { 
-                    name: item.variations.name,
-                    iamge_url: item.variations.image_url,
-                    price: item.price,
-                    quantity: item.quantity
-                }
-            })
-        })
+        for (let order of order_details) {
+            let total = 0
+            for (let order_item of order.order_items) {
+                total += (order_item.price * order_item.quantity)
+                order_item.name = order_item.variations.name
+                order_item.image_url = order_item.variations.image_url
+                delete order_item.variations
+            }
+            order.total = total
+        }
 
-        return res.json(SUCCESS(orders))
+        return res.json(SUCCESS(order_details))
     } catch (error) {
         console.log(error)
         res.json(ISE())
