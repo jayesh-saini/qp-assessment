@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "tsc -b && node dist/app.js",
-    "start": "npx prisma migrate dev && npx prisma db seed && tsc -b && node dist/app.js",
+    "start": "npx prisma migrate dev --name init && npx prisma db seed && tsc -b && node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
