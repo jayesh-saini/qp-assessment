@@ -1,4 +1,4 @@
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import "./style.scss";
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
@@ -44,39 +44,50 @@ const Orders = () => {
             <div className="order-heading-container">
                 <span>My Orders</span>
             </div>
-            {orders.length > 0 ?
-                (
-                    orders.map((order: any) => {
-                        return (
-                            <div className="order-card-container">
-                                <div className="order-card">
-                                    <div className="order-header d-flex">
-                                        <div>
-                                            <span className="order-id">Order Id: {order.id}</span>
-                                        </div>
-                                        <div>
-                                            <span className="order-id">Order Total: {order.total} ₹</span>
-                                        </div>
-                                        <div>
-                                            <span className="order-id">Created At: {format(order.created_at, "dd-MM-yy hh:mm aa")}</span>
-                                        </div>
-                                    </div>
-                                    <div className="order-body">
-                                        <div className="order-item-container">
-                                            <div className="item-img-container heading-img-container">
-                                                <span className="font-weight-bold">#</span>
+            {isFetchingOrders ?
+                (<div className="spinner-container">
+                    <Spinner
+                        as="span"
+                        animation="border"
+                        role="status"
+                        aria-hidden="true"
+                    />
+                    <span className="visually-hidden">Loading...</span>
+                </div>)
+                :
+                orders.length > 0 ?
+                    (
+                        orders.map((order: any) => {
+                            return (
+                                <div className="order-card-container">
+                                    <div className="order-card">
+                                        <div className="order-header d-flex">
+                                            <div>
+                                                <span className="order-id">Order Id: {order.id}</span>
                                             </div>
-                                            <div className="item-description-container">
-                                                <span className="font-weight-bold">Name</span>
+                                            <div>
+                                                <span className="order-id">Order Total: {order.total} ₹</span>
                                             </div>
-                                            <div className="item-other-container">
-                                                <span className="font-weight-bold">Quantity</span>
-                                            </div>
-                                            <div className="item-other-container text-end">
-                                                <span className="font-weight-bold">Price</span>
+                                            <div>
+                                                <span className="order-id">Created At: {format(order.created_at, "dd-MM-yy hh:mm aa")}</span>
                                             </div>
                                         </div>
-                                        {order.order_items.map((element: any) => (<div className="order-item-container">
+                                        <div className="order-body">
+                                            <div className="order-item-container">
+                                                <div className="item-img-container heading-img-container">
+                                                    <span className="font-weight-bold">#</span>
+                                                </div>
+                                                <div className="item-description-container">
+                                                    <span className="font-weight-bold">Name</span>
+                                                </div>
+                                                <div className="item-other-container">
+                                                    <span className="font-weight-bold">Quantity</span>
+                                                </div>
+                                                <div className="item-other-container text-end">
+                                                    <span className="font-weight-bold">Price</span>
+                                                </div>
+                                            </div>
+                                            {order.order_items.map((element: any) => (<div className="order-item-container">
                                                 <div className="item-img-container">
                                                     <img src={element.image_url} />
                                                 </div>
@@ -90,28 +101,28 @@ const Orders = () => {
                                                     <span>{element.price} ₹</span>
                                                 </div>
                                             </div>)
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
+                            )
+                        })
+                    ) :
+                    (
+                        <div className="no-orders-container">
+                            <div className="d-flex justify-content-center mt-3">
+                                <img src="https://rsrc.easyeat.ai/mweb/no-orders2.webp" />
                             </div>
-                        )
-                    })
-                ) :
-                (
-                    <div className="no-orders-container">
-                        <div className="d-flex justify-content-center mt-3">
-                            <img src="https://rsrc.easyeat.ai/mweb/no-orders2.webp" />
+                            <div className="d-flex justify-content-center mt-2">
+                                <span className="no-orders-text">No Orders Found</span>
+                            </div>
+                            <div className="d-flex justify-content-center">
+                                <Button variant="primary" onClick={() => {
+                                    navigate("/")
+                                }}>Start Ordering</Button>
+                            </div>
                         </div>
-                        <div className="d-flex justify-content-center mt-2">
-                            <span className="no-orders-text">No Orders Found</span>
-                        </div>
-                        <div className="d-flex justify-content-center">
-                            <Button variant="primary" onClick={() => {
-                                navigate("/")
-                            }}>Start Ordering</Button>
-                        </div>
-                    </div>
-                )}
+                    )}
         </div>
     )
 }

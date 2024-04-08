@@ -1,6 +1,6 @@
 import { useContext, useState } from "react"
 import { AuthContext } from "../../Context/AuthContext"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Form, Button, Spinner } from 'react-bootstrap';
 import api from "../../Context/interceptor";
 import "./sytle.scss"
