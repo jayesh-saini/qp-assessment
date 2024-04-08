@@ -4,27 +4,22 @@ import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import settings from "../../settings"
 import Spinner from 'react-bootstrap/Spinner';
 import { Toast, ToastContainer } from 'react-bootstrap';
 import { useNavigate } from "react-router-dom"
 import '../Header/Style.scss';
 import "./Style.scss"
-// import { useAuth } from '../../Context/AuthContext';
-
-import axios from "axios"
+import api from '../../Context/interceptor';
 
 const Products = () => {
-    // const { user } = useAuth()
-
     const navigate = useNavigate()
-    const { SERVER_BASE_URL } = settings
+
     const [show, setShow] = useState(false)
     const [testerShow, setToasterShow] = useState(false)
     const [products, setProducts] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [isProductAdding, setIsProductAdding] = useState(false)
-    const [product, setProduct] = useState({ name: "", desription: "" })
+    const [product, setProduct]: any = useState({ name: "", desription: "" })
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -32,7 +27,7 @@ const Products = () => {
     const fetchProductsHandler = async () => {
         try {
             setIsLoading(true)
-            const { data } = await axios.get(`${SERVER_BASE_URL}/admin/products`)
+            const { data } = await api.get(`/admin/products`)
             if (data.status == 200) {
                 setProducts(data.data)
             }
@@ -43,10 +38,23 @@ const Products = () => {
         }
     }
 
+    const validateNewProductData = () => {
+        if(!product.name || product.name == "") {
+            alert("Name is mandatory!")
+            throw new Error("Name is mandatory!")
+        } else if (!product.description || product.description == "") {
+            alert("Description is mandatory!")
+            throw new Error("Description is mandatory!")
+        }
+    }
+
     const addProductHander = async () => {
         try {
             setIsProductAdding(true)
-            const { data } = await axios.post(`${SERVER_BASE_URL}/admin/product`, {
+
+            validateNewProductData()
+
+            const { data } = await api.post(`/admin/product`, {
                 ...product
             })
             

@@ -1,26 +1,17 @@
-import axios from "axios"
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState } from "react"
 import { Spinner, Container, Row, Col } from "react-bootstrap"
-import settings from "../../settings"
-import { AuthContext } from "../../Context/AuthContext"
 import ProductCard from "../ProductCart/ProductCard"
 import "./style.scss"
+import api from "../../Context/interceptor"
 
 const ProductListing = () => {
-    const { SERVER_BASE_URL } = settings
     const [products, setProducts] = useState([])
     const [isFetching, setIsFetching] = useState(false)
-
-    const { authToken }: any = useContext(AuthContext)
-
+    
     const fetchProducts = async () => {
         try {
             setIsFetching(true)
-            const { data } = await axios.get(`${SERVER_BASE_URL}/user/products`, {
-                headers: {
-                    "access_token": authToken
-                }
-            })
+            const { data } = await api.get(`/user/products`,)
             if (data.status == 200) {
                 const localCart = JSON.parse(localStorage.getItem("cart") || "{}")
                 const prods = data.data.map((p: any) => {
@@ -50,14 +41,15 @@ const ProductListing = () => {
         <div className="p-5"> {
             isFetching ?
                 (<>
+                    <div className="spinner-container">
                     <Spinner
                         as="span"
                         animation="border"
-                        size="sm"
                         role="status"
                         aria-hidden="true"
                     />
                     <span className="visually-hidden">Loading...</span>
+                    </div>
                 </>)
                 :
                 <Container>

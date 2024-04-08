@@ -1,25 +1,22 @@
 import { Button, Form, Table, ToastContainer, Toast, Modal, Spinner } from "react-bootstrap"
 import { useNavigate, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
+import api from "../../Context/interceptor";
 import "./Style.scss";
-import setting from "../../settings";
-import axios from "axios";
 
 const ProductDetails = () => {
-    const { SERVER_BASE_URL } = setting
-    // let { state } = useLocation()
     let { product_id } = useParams()
     const navigate = useNavigate()
 
     const [product, setProduct]: any = useState({ name: "", description: "" })
-    const [newVariant, setNewVariant] = useState({ name: "", regular_price: 0, sale_price: 0, pack_size: 0, unit: "", stock: 0, image_url: "", product_id: -1 })
+    const [newVariant, setNewVariant] = useState({ name: "", regular_price: 0, sale_price: 0, pack_size: 0, unit: "gm", stock: 0, image_url: "", product_id: -1 })
     const [showModel, setShowModel] = useState(false)
     const [showSaveLoader, setShowSaveLoader] = useState(false)
     const [toasterShow, setToasterShow] = useState(false)
+    const [toasterMessage, setToasterMessage] = useState({ message: "" })
     const [isVariantAdding, setIsVariantAdding] = useState(false)
     const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false)
     const [isVariantDeleting, setIsVariantDeleting] = useState(false)
-    const [toasterMessage, setToasterMessage] = useState({ message: "" })
     const [variantIdToDelete, setVariantIdToDelete] = useState({ id: 0, index: -1 })
     const [isProductDeleting, setIsProductDeleting] = useState(false)
     const [isVariantEditing, setIsVariantEditing] = useState(false)
@@ -27,7 +24,7 @@ const ProductDetails = () => {
 
     const fetchProductData = async () => {
         try {
-            const { data } = await axios.get(`${SERVER_BASE_URL}/admin/product/${product_id}`)
+            const { data } = await api.get(`/admin/product/${product_id}`)
 
             if (data.status == 200) {
                 const variation = data.data.variations.map((v: any) => {
@@ -39,6 +36,7 @@ const ProductDetails = () => {
                 setNewVariant((prevState: any) => ({ ...prevState, product_id: data.data.id }))
             } else {
                 alert(data.message)
+                navigate('/admin/products')
             }
         } catch (error) {
             console.log(error)
@@ -76,9 +74,39 @@ const ProductDetails = () => {
         setProduct(p)
     }
 
+    const validateUpdateProduct = () => {
+        if(!product.name || product.name == "") {
+            alert("Name is mandatory!")
+            throw new Error("Name is mandatory!")
+        } else if (!product.description || product.description == "") {
+            alert("Description is mandatory!")
+            throw new Error("Description is mandatory!")
+        }
+    }
+
+    const validateVariantData = (newVar: any) => {
+       if(!newVar.name || newVar.name == "") {
+            alert("Name is mandatory!")
+            throw new Error("Name is mandatory!")
+        } else if (!newVar.regular_price || newVar.regular_price < 0) {
+            alert("Invalid regular price!")
+            throw new Error("Invalid regular price!")
+        } else if (!newVar.sale_price || newVar.sale_price < 0) {
+            alert("Invalid sale price!")
+            throw new Error("Invalid sale price!")
+        } else if (!newVar.stock || newVar.stock < 0) {
+            alert("Invalid stock!")
+            throw new Error("Invalid stock!")
+        } else if (!newVar.pack_size || newVar.pack_size < 0) {
+            alert("Invalid pack size!")
+            throw new Error("Invalid pack size!")
+        }
+    }
+
     const updateProductHandler = async () => {
         setShowSaveLoader(true)
-        const { data } = await axios.put(`${SERVER_BASE_URL}/admin/product/${product.id}`, {
+        validateUpdateProduct()
+        const { data } = await api.put(`/admin/product/${product.id}`, {
             name: product.name,
             description: product.description
         })
@@ -93,7 +121,10 @@ const ProductDetails = () => {
         try {
             setIsVariantEditing(true)
             const { id, isDisabled, ...variant } = updatePayload
-            const { data } = await axios.put(`${SERVER_BASE_URL}/admin/variant/${id}`, {
+            
+            validateVariantData(variant)
+            
+            const { data } = await api.put(`/admin/variant/${id}`, {
                 ...variant
             })
 
@@ -114,7 +145,11 @@ const ProductDetails = () => {
     const addVariantHandler = async () => {
         try {
             setIsVariantAdding(true)
-            const { data } = await axios.post(`${SERVER_BASE_URL}/admin/variation`, {
+console.log(newVariant);
+
+            validateVariantData(newVariant)
+
+            const { data } = await api.post(`/admin/variation`, {
                 ...newVariant
             })
 
@@ -125,6 +160,8 @@ const ProductDetails = () => {
                 const p = { ...product }
                 p.variations.push({ ...newVariant, isDisabled: true, id: data.data.id })
                 setProduct(p)
+            } else {
+                alert(data.message)
             }
         } catch (error) {
             console.log(error)
@@ -136,7 +173,7 @@ const ProductDetails = () => {
     const deleteVariantHandler = async () => {
         try {
             setIsVariantDeleting(true)
-            const { data } = await axios.delete(`${SERVER_BASE_URL}/admin/variation/${variantIdToDelete.id}`)
+            const { data } = await api.delete(`/admin/variation/${variantIdToDelete.id}`)
             if (data.status == 200) {
                 setToasterShow(true)
                 setToasterMessage((prevState: any) => ({ ...prevState, message: "Variant deleted successfully!!" }))
@@ -157,7 +194,7 @@ const ProductDetails = () => {
     const deleteProductHandler = async () => {
         try {
             setIsProductDeleting(true)
-            const { data } = await axios.delete(`${SERVER_BASE_URL}/admin/product/${product.id}`)
+            const { data } = await api.delete(`/admin/product/${product.id}`)
 
             if (data.status == 200) {
                 setToasterShow(true)
@@ -280,14 +317,25 @@ const ProductDetails = () => {
                                 <Form.Control onChange={(e) => setNewVariant((prevState: any) => ({ ...prevState, sale_price: parseInt(e.target.value) }))} type="number" />
                             </Form.Group>
                         </div>
-                        <div className="flexRowContainer">
+                        <div className="flexRowContainer d-flex">
                             <Form.Group className="mb-3 flex-fill" controlId="exampleForm.ControlTextarea1">
                                 <Form.Label>Pack Size</Form.Label>
                                 <Form.Control onChange={(e) => setNewVariant((prevState: any) => ({ ...prevState, pack_size: parseInt(e.target.value) }))} type="text" />
                             </Form.Group>
                             <Form.Group className="mb-3 flex-fill odd-form-group" controlId="exampleForm.ControlTextarea1">
                                 <Form.Label>Unit</Form.Label>
-                                <Form.Control onChange={(e) => setNewVariant((prevState: any) => ({ ...prevState, unit: e.target.value }))} type="text" />
+                                <Form.Select value={newVariant.unit} onChange={(e) => {
+                                    setNewVariant((prevState: any) => ({ ...prevState, unit: e.target.value }))
+                                }}>
+                                        <option value="gm">gm</option>
+                                        <option value="Kg">Kg</option>
+                                        <option value="Ltr">Ltr</option>
+                                        <option value="ml">ml</option>
+                                        <option value="Pack">Pack</option>
+                                        <option value="Piece">Piece</option>
+                                        <option value="Box">Box</option>
+                                </Form.Select>
+                                {/* <Form.Control onChange={(e) => setNewVariant((prevState: any) => ({ ...prevState, unit: e.target.value }))} type="text" /> */}
                             </Form.Group>
                         </div>
                         <div>
@@ -320,7 +368,7 @@ const ProductDetails = () => {
                         }
                     </Button>
                 </Modal.Footer>
-            </Modal>
+            </Modal >
             <div className="flexRowBWContainer p-4 product-details-header">
                 <div className="flex-fill">
                     <Form>
@@ -347,7 +395,7 @@ const ProductDetails = () => {
                 </div>
             </div>
             <div className="p-4">
-                { product.variations?.length == 0 ? <span>No Variations to display!</span> :
+                {product.variations?.length == 0 ? <span>No Variations to display!</span> :
                     <Table bordered hover>
                         <thead>
                             <tr>
@@ -404,7 +452,7 @@ const ProductDetails = () => {
                     </Table>
                 }
             </div>
-        </div>
+        </div >
     )
 }
 
