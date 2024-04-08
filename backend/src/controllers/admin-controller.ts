@@ -23,8 +23,7 @@ export const login = async(req: Request, res: Response) => {
         }
 
         if(validated_admin_creds) {
-            // if(!bcrypt.compareSync(validated_admin_creds.data.password, admin_details?.password))  {
-            if(validated_admin_creds.data.password != admin_details?.password) {
+            if(!bcrypt.compareSync(validated_admin_creds.data.password, admin_details?.password))  {
                 return res.json(RESPONSES(400, "Incorrect username or password!"))
             }
             const { password, ...admin } = admin_details
