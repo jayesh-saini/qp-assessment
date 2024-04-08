@@ -5,7 +5,7 @@ import { Button, Form, Spinner } from 'react-bootstrap'
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
-  const arr = [0,1,2,3,4,5,6,7,8,9,10]
+  const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([])
@@ -55,6 +55,13 @@ const Cart = () => {
         localCart[variant_id] = quantity
         cart[index].quantity = quantity
       }
+
+      let t: any = 0;
+      cart.map((variant: any) => {
+        t += variant.sale_price * localCart[variant.id]
+      })
+
+      setTotal(t)
 
       setCartItems(cart)
       localStorage.setItem("cart", JSON.stringify(localCart))
