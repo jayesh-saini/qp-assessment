@@ -40,7 +40,7 @@ console.log(role);
         <Route path='/login' element={ role == "user" ? <Navigate to="/" /> : <Login />} />
         <Route path='/register' element={<Auth />} />
 
-        <Route path='/admin/login' element={ <><AdminHeader/><AdminLogin /> </> } />
+        <Route path='/admin/login' element={ <AdminLogin /> } />
         <Route path='/admin/products' element={role == "admin" ? <><AdminHeader/><Products /> </>: <Navigate to="/admin/login" />} />
         <Route path='/admin/product/:product_id' element={role == "admin" ? <><AdminHeader/><ProductDetails /> </>:  <Navigate to="/admin/login" />} />
       </Routes>

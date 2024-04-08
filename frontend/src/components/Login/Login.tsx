@@ -79,6 +79,9 @@ const Login = () => {
                     <div className='p-2'>
                         <span>Don't have an account? <Link to={"/register"}>Register here</Link></span>
                     </div>
+                    <div className='p-2'>
+                        <Link to={"/admin/login"}>Login as admin</Link>
+                    </div>
                 </Form>
             </div>
         </div>
