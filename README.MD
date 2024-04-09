@@ -1,6 +1,9 @@
 # GROCERY STORE 🛒
 ## This is a demo grocery store application.
 
+Want to see the deployed version ?
+https://u4r.in/grocery_store_demo
+
 ## Tech Stack
 
 **Client:** React.js, React Bootstrap
@@ -81,6 +84,7 @@ Start docker on your machine
   docker-compose up
 ```
 
+Once you see "Server running...", open localhost on your machine
 
 ## API Reference
 
