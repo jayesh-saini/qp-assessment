@@ -11,9 +11,16 @@
 
 
 ## Screenshots
-
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
+### Home
+![App Screenshot](https://github.com/jayesh-saini/qp-assessment/blob/develop/screenshots/Home.png?raw=true)
+### Cart
+![App Screenshot](https://github.com/jayesh-saini/qp-assessment/blob/develop/screenshots/Cart.png?raw=true)
+### Orders
+![App Screenshot](https://github.com/jayesh-saini/qp-assessment/blob/develop/screenshots/Orders.png?raw=true)
+### Admin Home
+![App Screenshot](https://github.com/jayesh-saini/qp-assessment/blob/develop/screenshots/Admin%20Home.png?raw=true)
+### Product Edit
+![App Screenshot](https://github.com/jayesh-saini/qp-assessment/blob/develop/screenshots/Admin%20Prod%20Desc.png?raw=true)
 
 ## Run Locally
 
